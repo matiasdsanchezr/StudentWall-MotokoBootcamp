@@ -12,15 +12,15 @@ function Home(): JSX.Element {
         <Navbar />
       </header>
       <div className="grid justify-items-center content-center">
-        <h3 className="mt-10 text-2xl leading-none text-gray-900 md:text-3xl lg:text-4xl dark:text-white">
+        <h3 className="mt-10 text-2xl leading-none text-gray-900 md:text-3xl lg:text-4xl">
           Welcome to
         </h3>
-        <h1 className="mb-10 text-4xl leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+        <h1 className="mb-10 text-4xl leading-none text-gray-900 md:text-5xl lg:text-6xl">
           {"The Student's Wall"}
         </h1>
 
-        <div className="border-2 rounded-md p-2 sm:p-5 grid justify-items-center gap-2">
-          <h2 className="text-xl font-medium leading-none text-gray-900 md:text-2xl lg:text-3xl dark:text-white">
+        <div className="border-2 rounded-md p-2 sm:p-5 grid justify-items-center gap-2 text-center">
+          <h2 className="text-xl font-medium leading-none text-gray-900 md:text-2xl lg:text-3xl">
             Internet Identity Client
           </h2>
           {isAnonymous ? (
@@ -29,7 +29,7 @@ function Home(): JSX.Element {
               <h4>{principal?.toString()}</h4>
               <button
                 type="button"
-                className="m-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                className="m-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none"
                 onClick={login}
               >
                 Login
@@ -43,7 +43,7 @@ function Home(): JSX.Element {
                 <Link to="/messages">
                   <button
                     type="button"
-                    className="m-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                    className="m-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none"
                   >
                     Go to messages
                   </button>
@@ -56,7 +56,7 @@ function Home(): JSX.Element {
                   <Link to="/profile">
                     <button
                       type="button"
-                      className="m-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                      className="m-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 focus:outline-none"
                     >
                       Register
                     </button>

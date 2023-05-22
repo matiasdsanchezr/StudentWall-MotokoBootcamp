@@ -126,7 +126,7 @@ export default function Messages(): JSX.Element {
                 current={messagesPage}
                 total={Number(messagePagesCountQuery.data)}
                 onPageChange={(page) => {
-                  console.log(page);
+
                   setMessagesPage(page);
                 }}
               />
@@ -149,7 +149,7 @@ export default function Messages(): JSX.Element {
                 current={messagesRankedPage}
                 total={Number(messagePagesCountQuery.data)}
                 onPageChange={(page) => {
-                  console.log(page);
+    
                   setMessagesRankedPage(page);
                 }}
               />

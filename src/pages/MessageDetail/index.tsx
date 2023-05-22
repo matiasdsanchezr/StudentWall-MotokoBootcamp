@@ -130,7 +130,7 @@ const MessagesDetail = (): JSX.Element => {
           />
         </div>
         <div>
-          <p className="block font-bold text-ellipsis overflow-hidden text-gray-700 dark:text-gray-400">
+          <p className="block font-bold text-ellipsis overflow-hidden text-gray-700">
             Creator ID:{' '}
             <span className="font-normal">
               {messageQuery.data.creator.toString()}
@@ -138,7 +138,7 @@ const MessagesDetail = (): JSX.Element => {
           </p>
         </div>
         <div className="flex w-full justify-between items-center mt-auto">
-          <p className="font-semibold align-middle text-gray-800 dark:text-gray-400">
+          <p className="font-semibold align-middle text-gray-800">
             Total votes: {Number(messageQuery.data.vote)}
           </p>
           <div className="flex gap-2">

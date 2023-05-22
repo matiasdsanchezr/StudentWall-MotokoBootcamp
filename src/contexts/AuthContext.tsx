@@ -78,7 +78,6 @@ export const AuthProvider = (): JSX.Element => {
   };
 
   async function handleAuthenticated(client: AuthClient): Promise<void> {
-    console.log('updateClient');
     const isAuthenticated = await client.isAuthenticated();
     setIsAuthenticated(isAuthenticated);
 

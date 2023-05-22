@@ -143,7 +143,6 @@ export function useUpdateMessageMutation() {
   }
 
   const updateMessage = async ({ messageId, content }: Props) => {
-    console.log(messageId, content);
     return backendActor != null
       ? await backendActor.updateMessage(messageId, content)
       : await Promise.reject(new Error('User not authenticated'));

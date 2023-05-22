@@ -4,6 +4,8 @@
 
 :root {
   font-family: Roboto, Inter, Avenir, Helvetica, Arial, sans-serif;
+  color: #213547;
+  background-color: #ffffff;
 }
 
 * {
@@ -55,10 +57,4 @@ body,
     color: #213547;
     background-color: #ffffff;
   }
-  /* a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  } */
 }

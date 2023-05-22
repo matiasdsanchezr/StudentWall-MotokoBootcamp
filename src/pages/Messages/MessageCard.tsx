@@ -55,7 +55,7 @@ const MessageComponent = ({ message, vote }: Props): JSX.Element => {
 
   return (
     <div className="relative flex flex-col rounded-2xl bg-white p-6 pb-3 text-sm text-gray-500 w-full h-[350px] sm:w-[500px] border border-gray-200 shadow">
-      <div className="relative mb-2 w-[250] flex-grow overflow-hidden font-bold tracking-tight  dark:text-white">
+      <div className="relative mb-2 w-[250] flex-grow overflow-hidden font-bold tracking-tight">
         <p className="after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-16 after:bg-gradient-to-b after:from-transparent after:to-white after:to-65%">
           {'Text' in message.content
             ? message.content.Text
@@ -63,13 +63,13 @@ const MessageComponent = ({ message, vote }: Props): JSX.Element => {
         </p>
       </div>
       <div>
-        <p className="block font-bold text-ellipsis overflow-hidden text-gray-700 dark:text-gray-400">
+        <p className="block font-bold text-ellipsis overflow-hidden text-gray-700">
           Creator:{' '}
           <span className="font-normal">{message.creator.toString()}</span>
         </p>
       </div>
       <div className="flex w-full justify-between items-center mt-auto">
-        <p className="font-semibold align-middle text-gray-800 dark:text-gray-400">
+        <p className="font-semibold align-middle text-gray-800">
           Total votes: {Number(message.vote)}
         </p>
         <div className="flex gap-2">
