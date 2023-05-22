@@ -1,8 +1,11 @@
-import React from 'react'
-import styles from './Loader..module.css'
+import styles from './Loader..module.css';
 
-function Loader ({ className }: { className?: string }) {
-  return <span className={`${styles.loader} ${className}`} />
+interface Props {
+  className?: string;
 }
 
-export default Loader
+function Loader({ className }: Props): JSX.Element {
+  return <span className={`${styles.loader} ${className ?? ''}`} />;
+}
+
+export default Loader;

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AiOutlineLike, AiOutlineDislike } from 'react-icons/ai';
 import {
-  Message,
-  Vote,
+  type Message,
+  type Vote,
 } from '../../declarations/studentWallBackend/studentWallBackend.did';
 import Loader from '../../components/Loader';
 import { MdOutlineExpandMore } from 'react-icons/md';
@@ -11,38 +11,44 @@ import {
   useDownVoteMutation,
   useUpVoteMutation,
 } from '../../hooks/messages.hooks';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface Props {
   message: Message;
   vote?: Vote;
 }
 
-const MessageComponent = ({ message, vote }: Props) => {
+const MessageComponent = ({ message, vote }: Props): JSX.Element => {
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
   const upVoteMutation = useUpVoteMutation();
   const downVoteMutation = useDownVoteMutation();
 
-  async function onClickUpvote() {
+  function onClickUpvote(): void {
     if (vote != null && 'Upvote' in vote) return;
     if (message.id === undefined) return;
 
     setIsLoading(true);
     upVoteMutation.mutate(message.id, {
-      onSuccess: async () => {
+      onSuccess: () => {
         setIsLoading(false);
+        void queryClient.invalidateQueries({ queryKey: ['userVotes'] });
+        void queryClient.invalidateQueries({ queryKey: ['messages'] });
       },
     });
   }
 
-  async function onClickDownvote() {
+  function onClickDownvote(): void {
     if (vote != null && 'Downvote' in vote) return;
     if (message.id === undefined) return;
 
     setIsLoading(true);
     downVoteMutation.mutate(message.id, {
-      onSuccess: async () => {
+      onSuccess: () => {
         setIsLoading(false);
+        void queryClient.invalidateQueries({ queryKey: ['userVotes'] });
+        void queryClient.invalidateQueries({ queryKey: ['messages'] });
       },
     });
   }
@@ -70,14 +76,14 @@ const MessageComponent = ({ message, vote }: Props) => {
           <button onClick={onClickUpvote} disabled={isLoading}>
             <AiOutlineLike
               className={`text-4xl rounded-full p-1 bg-black/10 ${
-                vote != null && 'Upvote' in vote && 'bg-green-300'
+                vote != null && 'Upvote' in vote ? 'bg-green-300' : ''
               }`}
             />
           </button>
           <button onClick={onClickDownvote} disabled={isLoading}>
             <AiOutlineDislike
               className={`text-4xl rounded-full p-1 bg-black/10 ${
-                vote != null && 'Downvote' in vote && 'bg-red-300'
+                vote != null && 'Downvote' in vote ? 'bg-red-300' : ''
               }`}
             />
           </button>

@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ProtectedRoute from './layouts/ProtectedRoute';
 import Home from './pages/Home';
-import Error404 from './pages/Error404';
+// import Error404 from './pages/Error404';
 import { AuthProvider } from './contexts/AuthContext';
 import Messages from './pages/Messages';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function App() {
+function App(): JSX.Element {
   const router = createBrowserRouter([
     {
       element: <AuthProvider />,

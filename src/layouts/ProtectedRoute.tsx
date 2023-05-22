@@ -3,10 +3,11 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import Footer from '../components/Footer';
 
-const ProtectedRoute = () => {
+const ProtectedRoute = (): JSX.Element => {
   const { principal, profile } = useAuth();
 
-  if (principal?.isAnonymous() || !profile) return <Navigate to="/" replace />;
+  if (principal == null || principal.isAnonymous() || profile == null)
+    return <Navigate to="/" replace />;
 
   return (
     <>

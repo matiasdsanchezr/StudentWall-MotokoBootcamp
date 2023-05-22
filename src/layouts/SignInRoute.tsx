@@ -3,10 +3,11 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import Footer from '../components/Footer';
 
-const SignInRoute = () => {
-  const { principal, profile } = useAuth();
+const SignInRoute = (): JSX.Element => {
+  const { principal } = useAuth();
 
-  if (principal?.isAnonymous()) return <Navigate to="/" replace />;
+  if (principal == null || principal?.isAnonymous())
+    return <Navigate to="/" replace />;
 
   return (
     <>

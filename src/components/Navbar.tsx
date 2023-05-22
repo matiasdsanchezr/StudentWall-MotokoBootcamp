@@ -18,10 +18,10 @@ interface NavbarProps {
 
 interface UserDropdownProps {
   name: string;
-  onLogout: () => void;
+  onLogout: () => Promise<void>;
 }
 
-function UserDropdown({ name, onLogout }: UserDropdownProps) {
+function UserDropdown({ name, onLogout }: UserDropdownProps): JSX.Element {
   return (
     <Menu as="div" className="relative">
       <Menu.Button className="flex sm:mr-3 p-1 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">
@@ -39,8 +39,8 @@ function UserDropdown({ name, onLogout }: UserDropdownProps) {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="z-50 absolute min-w-max max-w-[280px] right-0 mt-2 p-2 divide-y divide-gray-100 rounded-md bg-white shadow-lg">
-          <div className="">
+        <Menu.Items className="z-50 absolute min-w-max max-w-[280px] right-0 mt-2 p-4 divide-y divide-gray-100 rounded-md bg-white shadow-lg">
+          <div className="mb-1 capitalize">
             <Menu.Item>
               <a className="block text-md font-medium">{name}</a>
             </Menu.Item>
@@ -48,13 +48,16 @@ function UserDropdown({ name, onLogout }: UserDropdownProps) {
           <div className="grid gap-1">
             <Menu.Item>
               <Link to="/profile">
-                <a className="" href="#">
-                  My profile
-                </a>
+                <span>My profile</span>
               </Link>
             </Menu.Item>
             <Menu.Item>
-              <a className="" onClick={onLogout}>
+              <a
+                className="hover:cursor-pointer"
+                onClick={(e) => {
+                  void onLogout();
+                }}
+              >
                 Logout
               </a>
             </Menu.Item>
@@ -65,7 +68,7 @@ function UserDropdown({ name, onLogout }: UserDropdownProps) {
   );
 }
 
-const MenuDropdown = () => {
+const MenuDropdown = (): JSX.Element => {
   return (
     <Menu as="div" className="">
       <Menu.Button className="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
@@ -85,7 +88,7 @@ const MenuDropdown = () => {
           {({ active }) => (
             <a
               className={`${
-                active && 'bg-blue-500'
+                active ? 'bg-blue-500' : ''
               } block text-center border-b-[3px]`}
               href="#"
             >
@@ -96,36 +99,23 @@ const MenuDropdown = () => {
         <Menu.Item>
           {({ active }) => (
             <Link to="/">
-              <a className={`${active && 'bg-blue-500'}`} href="#">
-                Home
-              </a>
+              <span className={`${active ? 'bg-blue-500' : ''}`}>Home</span>
             </Link>
           )}
         </Menu.Item>
         <Menu.Item>
           {({ active }) => (
-            <Link to="/messages/recents">
-              <a className={`${active && 'bg-blue-500'}`} href="#">
-                Messages
-              </a>
+            <Link to="/messages">
+              <span className={`${active ? 'bg-blue-500' : ''}`}>Messages</span>
             </Link>
           )}
         </Menu.Item>
         <Menu.Item>
           {({ active }) => (
             <Link to="/homeworks">
-              <a className={`${active && 'bg-blue-500'}`} href="#">
+              <span className={`${active ? 'bg-blue-500' : ''}`}>
                 Homeworks
-              </a>
-            </Link>
-          )}
-        </Menu.Item>
-        <Menu.Item>
-          {({ active }) => (
-            <Link to="/projects">
-              <a className={`${active && 'bg-blue-500'} block`} href="#">
-                Send Project
-              </a>
+              </span>
             </Link>
           )}
         </Menu.Item>
@@ -134,7 +124,9 @@ const MenuDropdown = () => {
   );
 };
 
-export default function NavbarComponent({ activeSection }: NavbarProps) {
+export default function NavbarComponent({
+  activeSection,
+}: NavbarProps): JSX.Element {
   const { isAnonymous, profile, logout } = useAuth();
 
   return (
@@ -143,17 +135,15 @@ export default function NavbarComponent({ activeSection }: NavbarProps) {
         <a href="#" className="flex items-center">
           <BiMessageSquareDetail className="mr-1 sm:mr-3 text-3xl sm:text-4xl" />
           <span className="text-2xl font-semibold whitespace-nowrap dark:text-white">
-            Students' Wall
+            {"Students' Wall"}
           </span>
         </a>
-        {!isAnonymous && profile ? (
+        {!isAnonymous && profile != null ? (
           <>
             <div className="flex items-center md:order-2">
               <UserDropdown
                 name={profile?.name ?? 'Anonymous'}
-                onLogout={() => {
-                  logout();
-                }}
+                onLogout={logout}
               />
               <MenuDropdown />
             </div>

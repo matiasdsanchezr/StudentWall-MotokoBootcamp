@@ -1,6 +1,9 @@
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Dialog, Tab, Transition } from '@headlessui/react';
-import { Content } from '../../declarations/studentWallBackend/studentWallBackend.did';
+import {
+  type Content,
+  type Vote,
+} from '../../declarations/studentWallBackend/studentWallBackend.did';
 import MessageCard from './MessageCard';
 import ResponsivePagination from 'react-responsive-pagination';
 import 'react-responsive-pagination/themes/classic.css';
@@ -12,16 +15,20 @@ import {
   useGetVotes,
   useWriteMessageMutation,
 } from '../../hooks/messages.hooks';
+import { useQueryClient } from '@tanstack/react-query';
 
-function classNames(...classes: any) {
+function classNames(...classes: any): string {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function Example() {
+export default function Messages(): JSX.Element {
+  const queryClient = useQueryClient();
+
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
   const [messagesPage, setMessagesPage] = useState(1);
   const [messagesRankedPage, setMessagesRankedPage] = useState(1);
   const [messageTextArea, setMessageTextArea] = useState('');
+  const [isMutating, setIsMutating] = useState(false);
 
   const [categories] = useState({
     Recent: null,
@@ -30,25 +37,34 @@ export default function Example() {
 
   const messagePagesCountQuery = useGetPagesCount();
   const messagesQuery = useGetPaginatedMessages(messagesPage);
-  const messagesRankedQuery = useGetPaginatedMessagesRanked(messagesPage);
+  const messagesRankedQuery = useGetPaginatedMessagesRanked(messagesRankedPage);
   const votesQuery = useGetVotes();
   const writeMessageMutation = useWriteMessageMutation();
 
-  function getMessageVote(messageId: bigint) {
+  function getMessageVote(messageId: bigint): Vote | undefined {
     if (votesQuery.data == null)
-      throw Promise.reject('Error while fetching votes');
+      throw new Error('Error while fetching user votes');
     const vote = votesQuery.data.get(messageId);
     return vote;
   }
 
-  function onChangeTextArea(e: React.ChangeEvent<HTMLTextAreaElement>) {
+  function onChangeTextArea(e: React.ChangeEvent<HTMLTextAreaElement>): void {
     setMessageTextArea(e.target.value);
   }
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
+    setIsMutating(true);
     const content: Content = { Text: messageTextArea };
-    writeMessageMutation.mutate(content);
+    writeMessageMutation.mutate(content, {
+      onSuccess: () => {
+        setIsMutating(false);
+        setShowNewMessageModal(false);
+        setMessageTextArea('');
+        void queryClient.invalidateQueries({ queryKey: ['messages'] });
+        void queryClient.invalidateQueries({ queryKey: ['messagesCount'] });
+      },
+    });
   }
 
   if (messagesQuery.isLoading || votesQuery.isLoading) {
@@ -61,7 +77,7 @@ export default function Example() {
     );
   }
 
-  if (messagesQuery.error || votesQuery.error) {
+  if (messagesQuery.isError || votesQuery.isError) {
     return (
       <div className="grid justify-center ">
         <h1 className="text-3xl sm:text-6xl text-center">
@@ -110,6 +126,7 @@ export default function Example() {
                 current={messagesPage}
                 total={Number(messagePagesCountQuery.data)}
                 onPageChange={(page) => {
+                  console.log(page);
                   setMessagesPage(page);
                 }}
               />
@@ -132,6 +149,7 @@ export default function Example() {
                 current={messagesRankedPage}
                 total={Number(messagePagesCountQuery.data)}
                 onPageChange={(page) => {
+                  console.log(page);
                   setMessagesRankedPage(page);
                 }}
               />
@@ -198,7 +216,7 @@ export default function Example() {
                       <button
                         type="submit"
                         className="btn-primary"
-                        disabled={messageTextArea.length < 10}
+                        disabled={messageTextArea.length < 10 || isMutating}
                       >
                         Publish
                       </button>

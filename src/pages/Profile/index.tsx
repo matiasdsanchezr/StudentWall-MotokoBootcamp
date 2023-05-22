@@ -1,17 +1,12 @@
-import React, { Fragment, useRef, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useMutation } from '@tanstack/react-query';
-import { StudentProfile } from '../../declarations/studentWallBackend/studentWallBackend.did';
-import { Link, redirect } from 'react-router-dom';
+import { Fragment, useRef, useState } from 'react';
+import { type StudentProfile } from '../../declarations/studentWallBackend/studentWallBackend.did';
+import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
+import { useUpdateProfile } from '../../hooks/user.hooks';
+import { useAuth } from '../../contexts/AuthContext';
 
-enum ModalType {
-  Success,
-  Error,
-}
-
-const Profile = () => {
-  const { backendActor, profile } = useAuth();
+const Profile = (): JSX.Element => {
+  const { refreshProfile } = useAuth();
 
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -21,52 +16,48 @@ const Profile = () => {
   const [modalTitle, setModalTitle] = useState('');
   const [modalDesc, setModalDesc] = useState('');
 
-  const saveProfile = useMutation({
-    mutationFn: async (profile: StudentProfile) => {
-      return backendActor != null
-        ? await backendActor.updateMyProfile(profile)
-        : await Promise.reject(new Error('User not authenticated'));
-    },
-  });
+  const saveProfile = useUpdateProfile();
 
-  function openModal(title: string, desc: string) {
+  function openModal(title: string, desc: string): void {
     setModalTitle(title);
     setModalDesc(desc);
     setShowModal(true);
   }
 
-  function onClose() {
+  function onClose(): void {
     setShowModal(false);
   }
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
-    if (!nameRef.current?.value) {
+    const name = nameRef.current?.value;
+    if (name == null) {
       openModal('Error', 'Please enter a valid name');
       return;
     }
-    if (emailRef.current == null || !emailRef.current.value) {
+    const email = emailRef.current?.value;
+    if (email == null) {
       openModal('Error', 'Please enter a valid email');
       return;
     }
-
+    const team = teamRef.current?.value;
     const profile: StudentProfile = {
-      name: nameRef.current.value,
-      email: emailRef.current.value,
-      team: [teamRef.current?.value ?? ''],
+      name,
+      email,
+      team: team != null ? [team] : [],
       graduate: false,
     };
-
     saveProfile.mutate(profile, {
       onSuccess: () => {
-        openModal('Success', 'Profile updated successfully');
+        void refreshProfile().then(() => {
+          openModal('Success', 'Profile updated successfully');
+        });
       },
-      onError: (e) => {
-        const message =
-          e instanceof Error
-            ? e.message
-            : 'Unexpected error. Contact with an admin';
-        openModal('Error', message);
+      onError: () => {
+        openModal(
+          'Error',
+          'An error occurred while saving your profile. Try again.',
+        );
       },
     });
   }
@@ -147,7 +138,12 @@ interface ModalProps {
   desc: string;
 }
 
-const Modal = ({ showModal, onClose, title, desc }: ModalProps) => {
+const Modal = ({
+  showModal,
+  onClose,
+  title,
+  desc,
+}: ModalProps): JSX.Element => {
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
