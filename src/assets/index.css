@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Roboto, Inter, Avenir, Helvetica, Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+#root,
+.App {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-width: 320px;
+  min-height: 100vh;
+  /* overflow-x: hidden; */
+}
+
+.App {
+  position: relative;
+  display: grid;
+  /* align-content: space-between; */
+  grid-template-rows: auto 1fr auto;
+}
+
+@layer components {
+  html {
+    /* Remove blue highlight when tapping in touch screen */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn-primary {
+    @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none;
+    @apply disabled:text-gray-400 disabled:bg-gray-500;
+  }
+
+  .btn-secondary {
+    @apply "rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2";
+  }
+
+  .input-primary {
+    @apply px-2 p-1 border-2 border-black/50 rounded;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  /* a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  } */
+}

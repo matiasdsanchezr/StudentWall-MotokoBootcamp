@@ -1,0 +1,20 @@
+{
+  "defaults": {
+    "build": {
+      "packtool": "npm run --silent sources"
+    }
+  },
+  "canisters": {
+    "studentWallBackend": {
+      "main": "backend/main.mo",
+      "type": "motoko"
+    },
+    "studentWallFrontend": {
+      "type": "assets",
+      "frontend": {
+        "entrypoint": "src/index.html"
+      },
+      "source": ["dist/"]
+    }
+  }
+}
