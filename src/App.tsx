@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from 'react-router-dom';
 import ProtectedRoute from './layouts/ProtectedRoute';
 import Home from './pages/Home';
 // import Error404 from './pages/Error404';
@@ -9,6 +13,8 @@ import SignInRoute from './layouts/SignInRoute';
 
 import Profile from './pages/Profile';
 import MessagesDetail from './pages/MessageDetail';
+import PublicRoute from './layouts/PublicRoute';
+import About from './pages/About';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,8 +31,11 @@ function App(): JSX.Element {
       element: <AuthProvider />,
       children: [
         {
-          path: '/home',
-          element: <Home />,
+          element: <PublicRoute />,
+          children: [
+            { path: '/home', element: <Home /> },
+            { path: '/about', element: <About /> },
+          ],
         },
         {
           element: <SignInRoute />,
@@ -52,7 +61,7 @@ function App(): JSX.Element {
         },
         {
           path: '/*',
-          element: <Home />,
+          element: <Navigate to="/home" />,
         },
       ],
     },

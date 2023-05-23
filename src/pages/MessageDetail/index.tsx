@@ -70,12 +70,14 @@ const MessagesDetail = (): JSX.Element => {
 
   function onClickDeleteConfirm(): void {
     if (messageId == null) return;
+    setIsLoading(true);
     setShowConfirmDialog(false);
     deleteMessageMutation.mutate(BigInt(messageId), {
       onSuccess: () => {
         setShowConfirmDialog(true);
         void queryClient.invalidateQueries({ queryKey: ['userVotes'] });
         void queryClient.invalidateQueries({ queryKey: ['messages'] });
+        setIsLoading(false);
         navigate('/messages');
       },
     });
@@ -91,9 +93,9 @@ const MessagesDetail = (): JSX.Element => {
     votesQuery.isLoading
   ) {
     return (
-      <div className="grid items-center h-full">
-        <h1 className="text-3xl sm:text-6xl text-center">
-          Loading messages...
+      <div className="grid items-center justify-center h-full">
+        <h1 className="text-3xl sm:text-6xl w=min">
+          <Loader className="border-t-gray-400" />
         </h1>
       </div>
     );
@@ -173,7 +175,9 @@ const MessagesDetail = (): JSX.Element => {
           <span className="font-semibold">Team: </span>
           <span>
             {' '}
-            {studentProfileQuery.data?.team != null || 'No team registered'}
+            {studentProfileQuery.data?.team != null
+              ? studentProfileQuery.data?.team
+              : 'No team registered'}
           </span>
         </div>
         <div className="overflow-ellipsis overflow-hidden">
@@ -187,7 +191,10 @@ const MessagesDetail = (): JSX.Element => {
           <button className="btn-primary" onClick={onClickEdit}>
             Edit message
           </button>
-          <button className="btn-primary" onClick={onClickDelete}>
+          <button
+            className="btn-primary bg-red-400 hover:bg-red-500"
+            onClick={onClickDelete}
+          >
             Delete
           </button>
         </div>

@@ -135,7 +135,7 @@ export default function NavbarComponent({
         <Link to="/home" className="flex items-center">
           <BiMessageSquareDetail className="mr-1 sm:mr-3 text-3xl sm:text-4xl" />
           <span className="text-2xl font-semibold whitespace-nowrap">
-            {"Students' Wall"}
+            {'Student Wall'}
           </span>
         </Link>
         {!isAnonymous && profile != null ? (

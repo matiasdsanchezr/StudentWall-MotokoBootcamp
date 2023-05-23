@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const Footer = (): JSX.Element => {
   return (
     <footer className="w-auto bg-white rounded-lg shadow mb-2 sm:m-2 md:m-4">
@@ -13,17 +15,17 @@ const Footer = (): JSX.Element => {
         </span>
         <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 sm:mt-0">
           <li>
-            <a
-              href="https://github.com/matiasdsanchezr"
-              className="mr-4 hover:underline md:mr-6 "
-            >
+            <Link to="/about" className="mr-4 hover:underline md:mr-6 ">
               About
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#" className="hover:underline">
+            <Link
+              to="https://github.com/matiasdsanchezr"
+              className="hover:underline"
+            >
               Contact
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

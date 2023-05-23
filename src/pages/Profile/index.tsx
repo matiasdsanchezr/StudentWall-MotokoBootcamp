@@ -63,7 +63,7 @@ const Profile = (): JSX.Element => {
   }
 
   return (
-    <div className="grid justify-items-center">
+    <div className="grid justify-items-center content-center min-h-full">
       <h2 className="text-4xl sm:text-5xl mb-6 sm:mb-7 m-3">Student Profile</h2>
       <form className="grid gap-5 w-56" onSubmit={onSubmit}>
         <div className="grid">
@@ -114,7 +114,7 @@ const Profile = (): JSX.Element => {
           </button>
           <button
             type="reset"
-            className="btn-primary"
+            className="btn-primary bg-gray-400 hover:bg-gray-500"
             disabled={saveProfile.isLoading}
           >
             Reset
@@ -185,14 +185,14 @@ const Modal = ({
                     className="btn-primary"
                     onClick={onClose}
                   >
-                    Continue
+                    <Link to="/">Return home</Link>
                   </button>
                   <button
                     type="button"
-                    className="ml-5 btn-primary"
+                    className="btn-primary ml-5 bg-gray-400 hover:bg-gray-500"
                     onClick={onClose}
                   >
-                    <Link to="/">Return to home</Link>
+                    Continue
                   </button>
                 </div>
               </Dialog.Panel>

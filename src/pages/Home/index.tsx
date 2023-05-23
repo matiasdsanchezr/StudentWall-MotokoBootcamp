@@ -1,22 +1,17 @@
 import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
 
 function Home(): JSX.Element {
   const { principal, login, isAnonymous, profile } = useAuth();
 
   return (
     <>
-      <header>
-        <Navbar />
-      </header>
-      <div className="grid justify-items-center content-center">
+      <div className="grid justify-items-center content-center min-h-full">
         <h3 className="mt-10 text-2xl leading-none text-gray-900 md:text-3xl lg:text-4xl">
           Welcome to
         </h3>
         <h1 className="mb-10 text-4xl leading-none text-gray-900 md:text-5xl lg:text-6xl">
-          {"The Student's Wall"}
+          {'The Student Wall'}
         </h1>
 
         <div className="border-2 rounded-md p-2 sm:p-5 grid justify-items-center gap-2 text-center">
@@ -67,7 +62,6 @@ function Home(): JSX.Element {
           )}
         </div>
       </div>
-      <Footer />
     </>
   );
 }

@@ -59,7 +59,7 @@ actor {
 
   type StudentProfileResult = Result.Result<StudentProfile, Text>;
 
-  public query func seeAProfile(p : Principal) : async StudentProfileResult {
+  public shared query func seeAProfile(p : Principal) : async StudentProfileResult {
     switch (Map.get(studentProfileStore, phash, p)) {
       case (?student) return #ok(student);
       case null return #err("Not registered student");
@@ -152,7 +152,7 @@ actor {
   };
 
   // Get student's votes, instantiate a new one if not found
-  public shared ({ caller }) func getStudentVotes() : async [(Nat, Vote)] {
+  public shared query ({ caller }) func getStudentVotes() : async [(Nat, Vote)] {
     if (Principal.isAnonymous(caller)) return [];
     let voteStore = _getStudentVotes(caller);
     Iter.toArray((Map.entries(voteStore)));
@@ -233,7 +233,7 @@ actor {
   };
 
   // Get all messages
-  public shared ({ caller }) func getAllMessages() : async [Message] {
+  public shared query ({ caller }) func getAllMessages() : async [Message] {
     if (Principal.isAnonymous(caller)) return [];
     Iter.toArray<Message>(Map.vals(wall));
   };
@@ -250,21 +250,26 @@ actor {
   };
 
   // Get all messages ordered by votes.
-  public func getAllMessagesRanked() : async [Message] {
+  public shared query func getAllMessagesRanked() : async [Message] {
     let sortedMessages = Iter.sort(Map.vals(wall), _compareVote);
     Iter.toArray<Message>(sortedMessages);
   };
 
   // Return messages' pages count. 10 messages per page.
-  public func getMessagesPageCount() : async Int {
+  public shared query func getMessagesPageCount() : async Int {
+    let x : Float = Float.fromInt(Map.size(wall)) / 10;
+    Float.toInt(Float.ceil(x));
+  };
+
+  func _getMessagesPageCount() : Int {
     let x : Float = Float.fromInt(Map.size(wall)) / 10;
     Float.toInt(Float.ceil(x));
   };
 
   // Get paginated message. Returns 10 messages per page.
-  public func getPaginatedMessages(pageNumber : Nat) : async [Message] {
+  public shared query func getPaginatedMessages(pageNumber : Nat) : async [Message] {
     if (pageNumber == 0) return [];
-    let pagesCount = await getMessagesPageCount();
+    let pagesCount = _getMessagesPageCount();
     if (pageNumber > pagesCount) return [];
 
     let messagesIter = Map.vals(wall);
@@ -282,9 +287,9 @@ actor {
   };
 
   // Get paginated message ranked by votes. Returns 10 messages per page.
-  public func getPaginatedMessagesRanked(pageNumber : Nat) : async [Message] {
+  public shared query func getPaginatedMessagesRanked(pageNumber : Nat) : async [Message] {
     if (pageNumber == 0) return [];
-    let pagesCount = await getMessagesPageCount();
+    let pagesCount = _getMessagesPageCount();
     if (pageNumber > pagesCount) return [];
 
     let messagesIter = Map.vals(wall);
