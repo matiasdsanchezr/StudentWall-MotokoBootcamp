@@ -9,6 +9,7 @@ import Float "mo:base/Float";
 import Array "mo:base/Array";
 import Debug "mo:base/Debug";
 import Text "mo:base/Text";
+import Bool "mo:base/Bool";
 
 actor {
   let { phash; nhash } = Map;
@@ -80,7 +81,7 @@ actor {
   };
 
   // ====================================================
-  // ============ Messages ==============================
+  // ==================== Messages ======================
   // ====================================================
   public type Vote = {
     #Upvote;
@@ -93,9 +94,29 @@ actor {
   stable let wall = Map.new<Nat, Message>(nhash);
   stable let studentVoteStore = Map.new<Principal, VoteStore>(phash);
 
+  // Check content of message
+  // TODO: Add image and survey verification
+  func _checkContent(c : Content) : Result.Result<(), Text> {
+    switch (c) {
+      case (#Text(text)) {
+        if (Text.size(text) > 5000) return #err("Only 5000 character per message allowed");
+      };
+      case (_) {};
+    };
+    #ok;
+  };
+
   // Add a new message to the wall
   public shared ({ caller }) func writeMessage(c : Content) : async Result.Result<Nat, Text> {
-    if (Principal.isAnonymous(caller)) return #err("Anonymous caller");
+    if (Principal.isAnonymous(caller)) return #err("An Anonymous caller is not allowed to publish a message");
+
+    switch (_checkContent(c)) {
+      case (#err(msg)) {
+        return #err(msg);
+      };
+      case (_) {};
+    };
+
     let newMessageId = messageId;
     messageId += 1;
 
@@ -110,17 +131,16 @@ actor {
     #ok(newMessageId);
   };
 
-  // Get a specific message by ID
-  public shared query func getMessage(messageId : Nat) : async Result.Result<Message, Text> {
-    switch (Map.get(wall, nhash, messageId)) {
-      case (?message) #ok(message);
-      case (_) #err("Invalid message id");
-    };
-  };
-
   // Update the content for a specific message by ID
   public shared ({ caller }) func updateMessage(messageId : Nat, c : Content) : async Result.Result<(), Text> {
     if (Principal.isAnonymous(caller)) return #err("Anonymous caller");
+
+    switch (_checkContent(c)) {
+      case (#err(msg)) {
+        return #err(msg);
+      };
+      case (_) {};
+    };
 
     let message = switch (Map.get(wall, nhash, messageId)) {
       case null return #err("Invalid message id");
@@ -140,6 +160,14 @@ actor {
 
     Map.set(wall, nhash, messageId, updatedMessage);
     #ok();
+  };
+
+  // Get a specific message by ID
+  public shared query func getMessage(messageId : Nat) : async Result.Result<Message, Text> {
+    switch (Map.get(wall, nhash, messageId)) {
+      case (?message) #ok(message);
+      case (_) #err("Invalid message id");
+    };
   };
 
   // Delete a specific message by ID

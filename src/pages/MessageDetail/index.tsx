@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   useDeleteMessage,
@@ -12,9 +12,9 @@ import { AiOutlineDislike, AiOutlineLike } from 'react-icons/ai';
 import Loader from '../../components/Loader';
 import { type Vote } from '../../declarations/studentWallBackend/studentWallBackend.did';
 import { useAuth } from '../../contexts/AuthContext';
-import { Dialog, Transition } from '@headlessui/react';
 import EditModal from './EditModal';
 import { useQueryClient } from '@tanstack/react-query';
+import ConfirmDialog from './ConfirmDialog';
 
 const MessagesDetail = (): JSX.Element => {
   const queryClient = useQueryClient();
@@ -35,8 +35,8 @@ const MessagesDetail = (): JSX.Element => {
   const votesQuery = useGetVotes();
 
   useEffect(() => {
-    if (votesQuery.data == null) return;
-    setVote(votesQuery.data.get(BigInt(messageId ?? 0)));
+    if (votesQuery.data == null || messageId == null) return;
+    setVote(votesQuery.data.get(BigInt(messageId)));
     setIsLoading(false);
   }, [votesQuery.data]);
 
@@ -64,10 +64,6 @@ const MessagesDetail = (): JSX.Element => {
     });
   }
 
-  function onClickDelete(): void {
-    setShowConfirmDialog(true);
-  }
-
   function onClickDeleteConfirm(): void {
     if (messageId == null) return;
     setIsLoading(true);
@@ -81,10 +77,6 @@ const MessagesDetail = (): JSX.Element => {
         navigate('/messages');
       },
     });
-  }
-
-  function onClickEdit(): void {
-    setShowEditModal(true);
   }
 
   if (
@@ -123,7 +115,7 @@ const MessagesDetail = (): JSX.Element => {
           <textarea
             className="flex-grow resize-none block focus:border-none focus:outline-none"
             readOnly={true}
-            // maxLength={200}
+            maxLength={5000}
             value={
               'Text' in messageQuery.data.content
                 ? messageQuery.data.content.Text
@@ -188,12 +180,19 @@ const MessagesDetail = (): JSX.Element => {
       {/* Edit and Delete buttons section */}
       {principal != null && creatorPrincipal?.compareTo(principal) === 'eq' && (
         <div className="flex gap-5">
-          <button className="btn-primary" onClick={onClickEdit}>
+          <button
+            className="btn-primary"
+            onClick={() => {
+              setShowEditModal(true);
+            }}
+          >
             Edit message
           </button>
           <button
             className="btn-primary bg-red-400 hover:bg-red-500"
-            onClick={onClickDelete}
+            onClick={() => {
+              setShowConfirmDialog(true);
+            }}
           >
             Delete
           </button>
@@ -213,68 +212,11 @@ const MessagesDetail = (): JSX.Element => {
         setShowModal={setShowEditModal}
         message={messageQuery.data}
       />
-      {/* Confirmation dialog */}
-      <Transition appear show={showConfirmDialog} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-[1000]"
-          onClose={() => {
-            setShowConfirmDialog(false);
-          }}
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Delete message
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Are you sure you want to delete this message?.
-                      <br />
-                      Deleted messages cannot be recovered.
-                    </p>
-                  </div>
-
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={onClickDeleteConfirm}
-                    >
-                      Confirm
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      <ConfirmDialog
+        showConfirmDialog={showConfirmDialog}
+        setShowConfirmDialog={setShowConfirmDialog}
+        onClickConfirm={onClickDeleteConfirm}
+      />
     </div>
   );
 };
