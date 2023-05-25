@@ -15,6 +15,7 @@ import Profile from './pages/Profile';
 import MessagesDetail from './pages/MessageDetail';
 import PublicRoute from './layouts/PublicRoute';
 import About from './pages/About';
+import Homeworks from './pages/Homeworks';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,10 @@ function App(): JSX.Element {
             {
               path: '/messages/:messageId',
               element: <MessagesDetail />,
+            },
+            {
+              path: '/homeworks/',
+              element: <Homeworks />,
             },
           ],
         },

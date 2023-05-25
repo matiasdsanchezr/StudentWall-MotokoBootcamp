@@ -5,7 +5,6 @@ import {
   type Vote,
 } from '../../declarations/studentWallBackend/studentWallBackend.did';
 import Loader from '../../components/Loader';
-import { MdOutlineExpandMore } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import {
   useDownVoteMutation,
@@ -54,15 +53,26 @@ const MessageComponent = ({ message, vote }: Props): JSX.Element => {
   }
 
   return (
-    <div className="relative flex flex-col rounded-2xl bg-white p-6 pb-3 text-sm text-gray-500 w-full h-[350px] sm:w-[500px] border border-gray-200 shadow">
-      <div className="relative mb-2 w-[250] flex-grow overflow-hidden font-bold tracking-tight">
-        <p className="after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-16 after:bg-gradient-to-b after:from-transparent after:to-white after:to-65%">
+    <div className="relative flex flex-col min-h-96 rounded-2xl bg-white p-6 pb-3 text-sm text-gray-500 w-full sm:w-[500px] border border-gray-200 shadow">
+      <div className="relative mb-2w-[250]  flex-grow overflow-hidden font-bold tracking-tight">
+        <p className="line-clamp-6">
           {'Text' in message.content
             ? message.content.Text
             : 'Non textual content'}
         </p>
       </div>
-      <div>
+      <div className="justify-center py-3 border-b-2 border-gray-300">
+        <Link
+          to={`/messages/${message.id}`}
+          className="cursor-pointer flex gap-1 justify-center align-middle items-center content-center justify-items-center"
+        >
+          <p className="inline text-md font-medium hover:text-blue-600">
+            More details
+          </p>
+          {/* <AiOutlinePlusCircle className="inline text-lg" /> */}
+        </Link>
+      </div>
+      <div className="mt-3">
         <p className="block font-bold text-ellipsis overflow-hidden text-gray-700">
           Creator:{' '}
           <span className="font-normal">{message.creator.toString()}</span>
@@ -89,15 +99,7 @@ const MessageComponent = ({ message, vote }: Props): JSX.Element => {
           </button>
         </div>
       </div>
-      <div className="flex justify-center">
-        <Link
-          to={`/messages/${message.id}`}
-          className="cursor-pointer grid justify-items-center"
-        >
-          <p className="">Read more</p>
-          <MdOutlineExpandMore />
-        </Link>
-      </div>
+
       {/* Loading animation */}
       {isLoading && (
         <div className="fixed z-[1000] top-0 left-0 w-screen h-screen bg-black/30 grid justify-center content-center justify-items-center">

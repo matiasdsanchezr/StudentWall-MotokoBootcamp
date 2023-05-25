@@ -10,10 +10,16 @@ import Array "mo:base/Array";
 import Debug "mo:base/Debug";
 import Text "mo:base/Text";
 import Bool "mo:base/Bool";
+import Vector "mo:vector";
+import Int "mo:base/Int";
 
 actor {
-  let { phash; nhash } = Map;
+  let { phash; nhash; ihash } = Map;
   type Time = Time.Time;
+
+  // ============================================
+  // ============ Student Profile ===============
+  // ============================================
 
   public type StudentProfile = {
     name : Text;
@@ -21,40 +27,6 @@ actor {
     team : ?Text;
     graduate : Bool;
   };
-
-  public type Homework = {
-    title : Text;
-    description : Text;
-    dueDate : Time;
-    completed : Bool;
-  };
-
-  public type Content = {
-    #Text : Text;
-    #Image : Blob;
-    #Survey : Survey;
-  };
-
-  public type Answer = (
-    description : Text, // contains description of the answer
-    numberOfVotes : Nat // represents the number of votes for this answer
-  );
-
-  public type Survey = {
-    title : Text; // title describes the survey
-    answers : [Answer]; // possible answers for the survey
-  };
-
-  public type Message = {
-    id : Nat;
-    content : Content;
-    vote : Int;
-    creator : Principal;
-  };
-
-  // ============================================
-  // ============ Student Profile ===============
-  // ============================================
 
   stable let studentProfileStore = Map.new<Principal, StudentProfile>(phash);
 
@@ -83,6 +55,29 @@ actor {
   // ====================================================
   // ==================== Messages ======================
   // ====================================================
+  public type Content = {
+    #Text : Text;
+    #Image : Blob;
+    #Survey : Survey;
+  };
+
+  public type Answer = (
+    description : Text, // contains description of the answer
+    numberOfVotes : Nat // represents the number of votes for this answer
+  );
+
+  public type Survey = {
+    title : Text; // title describes the survey
+    answers : [Answer]; // possible answers for the survey
+  };
+
+  public type Message = {
+    id : Nat;
+    content : Content;
+    vote : Int;
+    creator : Principal;
+  };
+
   public type Vote = {
     #Upvote;
     #Downvote;
@@ -332,6 +327,108 @@ actor {
     messagesBuf := Buffer.subBuffer(messagesBuf, (pageNumber - 1) * 10 : Nat, length);
 
     Buffer.toArray<Message>(messagesBuf);
+  };
+
+  // ====================================================
+  // ================ Homework Diary ====================
+  // ====================================================
+  type Homework = {
+    title : Text;
+    description : Text;
+    dueDate : Time;
+    completed : Bool;
+  };
+
+  public type DiaryStore = Map.Map<Int, Homework>;
+  stable let studentDiaryStore = Map.new<Principal, DiaryStore>(phash);
+
+  func _getDiary(principalId : Principal) : DiaryStore {
+    switch (Map.get(studentDiaryStore, phash, principalId)) {
+      case (?diary) diary;
+      case null {
+        let newDiary = Map.new<Int, Homework>(ihash);
+        _setDiary(principalId, newDiary);
+        newDiary;
+      };
+    };
+  };
+
+  func _setDiary(principalId : Principal, diary : DiaryStore) : () {
+    Map.set(studentDiaryStore, phash, principalId, diary);
+  };
+
+  public shared ({ caller }) func addHomework(homework : Homework) : async Int {
+    let diary = _getDiary(caller);
+    let homeworkId : Int = Time.now();
+    Map.set(diary, ihash, homeworkId, homework);
+    homeworkId;
+  };
+
+  public shared query ({ caller }) func getHomework(id : Nat) : async Result.Result<Homework, Text> {
+    let diary = _getDiary(caller);
+    switch (Map.get(diary, ihash, id)) {
+      case (?homework) #ok(homework);
+      case (_) #err("Invalid id");
+    };
+  };
+
+  public shared ({ caller }) func updateHomework(id : Nat, homework : Homework) : async Result.Result<(), Text> {
+    let diary = _getDiary(caller);
+    switch (Map.get(diary, ihash, id)) {
+      case null #err("Invalid id");
+      case (?oldHomework) {
+        Map.set(diary, ihash, id, homework);
+        #ok;
+      };
+    };
+  };
+
+  public shared ({ caller }) func markAsCompleted(id : Nat) : async Result.Result<(), Text> {
+    let diary = _getDiary(caller);
+    let homework = switch (Map.get(diary, ihash, id)) {
+      case null return #err("Invalid id");
+      case (?homework) homework;
+    };
+
+    let modifiedHomework = {
+      title = homework.title;
+      description = homework.description;
+      dueDate = homework.dueDate;
+      completed = true;
+    };
+
+    Map.set(diary, ihash, id, modifiedHomework);
+    #ok;
+  };
+
+  public shared ({ caller }) func deleteHomework(id : Nat) : async Result.Result<(), Text> {
+    let diary = _getDiary(caller);
+    switch (Map.remove(diary, ihash, id)) {
+      case null return #err("Invalid id");
+      case (?homework) #ok;
+    };
+  };
+
+  public shared query ({ caller }) func getAllHomework() : async [(Int, Homework)] {
+    let diary = _getDiary(caller);
+    Map.toArray(diary);
+  };
+
+  public shared query ({ caller }) func getPendingHomework() : async [(Int, Homework)] {
+    let diary = _getDiary(caller);
+    let homeworkArr = Map.toArray(diary);
+    Array.filter<(Int, Homework)>(homeworkArr, func(x, y) = y.completed == false);
+  };
+
+  public shared query ({ caller }) func searchHomework(searchTerm : Text) : async [(Int, Homework)] {
+    let diary = _getDiary(caller);
+    let homeworkArr = Map.toArray<Int, Homework>(diary);
+    let pattern = #text searchTerm;
+
+    Array.filter<(Int, Homework)>(
+      homeworkArr,
+      func x = Text.contains(x.1.title, pattern) or Text.contains(x.1.description, pattern),
+    );
   };
 
 };
