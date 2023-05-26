@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useCallback, useRef, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { useAddHomework } from '../../hooks/homeworkDiary.hooks';
 import { type Homework } from '../../declarations/studentWallBackend/studentWallBackend.did';
 import { useQueryClient } from '@tanstack/react-query';
@@ -8,42 +8,50 @@ import Loader from '../../components/Loader';
 interface Props {
   showModal: boolean;
   setShowModal: (showModal: boolean) => void;
+  homework?: Homework;
 }
 
-const AddHomeworkModal = ({ showModal, setShowModal }: Props): JSX.Element => {
+const AddHomeworkModal = ({
+  showModal,
+  setShowModal,
+  homework,
+}: Props): JSX.Element => {
   const queryClient = useQueryClient();
+
   const titleRef = useRef<HTMLInputElement>(null);
-  const [description, setDescription] = useState<string>('');
+  const dueDateRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
   const [isMutating, setIsMutating] = useState(false);
   const addHomeworkMutation = useAddHomework();
 
-  const onSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>): void => {
-      e.preventDefault();
-      const title = titleRef.current?.value;
-      if (title === undefined) return;
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+    const title = titleRef.current?.value;
+    if (title === undefined) return;
+    const description = descriptionRef.current?.value;
+    if (description === undefined) return;
+    const dueDateString = dueDateRef.current?.value;
+    if (dueDateString === undefined) return;
 
-      if (description === undefined) return;
+    const dueDate = Date.parse(dueDateString);
 
-      const newHomework: Homework = {
-        title,
-        description,
-        dueDate: BigInt(Date.now()),
-        completed: false,
-      };
+    const newHomework: Homework = {
+      title,
+      description,
+      dueDate: BigInt(dueDate),
+      completed: false,
+    };
 
-      console.log(description);
-      setIsMutating(true);
-      addHomeworkMutation.mutate(newHomework, {
-        onSuccess: () => {
-          void queryClient.invalidateQueries(['homeworks']);
-          setIsMutating(false);
-          setShowModal(false);
-        },
-      });
-    },
-    [description],
-  );
+    setIsMutating(true);
+    addHomeworkMutation.mutate(newHomework, {
+      onSuccess: () => {
+        void queryClient.invalidateQueries(['homeworks']);
+        setIsMutating(false);
+        setShowModal(false);
+      },
+    });
+  };
 
   return (
     <div>
@@ -84,23 +92,26 @@ const AddHomeworkModal = ({ showModal, setShowModal }: Props): JSX.Element => {
                     Add new homework
                   </Dialog.Title>
                   <form className="flex-grow flex flex-col" onSubmit={onSubmit}>
-                    <input type="text" placeholder="Title" ref={titleRef} />
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      ref={titleRef}
+                      required={true}
+                    />
                     <textarea
                       id="story"
                       className="p-2 bg-black/10 rounded-xl w-full flex-grow mb-4 resize-none border-2 border-gray-300"
                       placeholder="Write a message with a minimum of 10 characters..."
                       required={true}
-                      onChange={(e) => {
-                        setDescription(e.currentTarget.value);
-                      }}
+                      ref={descriptionRef}
                       minLength={5}
                     />
-                    <input type="date" />
+                    <input type="date" required={true} ref={dueDateRef} />
                     <div className="ml-auto">
                       <button
                         type="submit"
                         className="btn-primary"
-                        disabled={description.length < 10}
+                        // disabled={description.length < 10}
                       >
                         Save
                       </button>

@@ -45,3 +45,16 @@ export function useDeleteHomework() {
     mutationFn: deleteHomework,
   });
 }
+
+export function useToggleCompleted() {
+  const { backendActor } = useAuth();
+
+  const toggleCompleted = async (homeworkId: bigint) => {
+    const res = await backendActor?.toggleCompleted(homeworkId);
+    return res;
+  };
+
+  return useMutation({
+    mutationFn: toggleCompleted,
+  });
+}

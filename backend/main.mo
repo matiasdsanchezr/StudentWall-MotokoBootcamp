@@ -383,7 +383,7 @@ actor {
     };
   };
 
-  public shared ({ caller }) func markAsCompleted(id : Nat) : async Result.Result<(), Text> {
+  public shared ({ caller }) func toggleCompleted(id : Nat) : async Result.Result<(), Text> {
     let diary = _getDiary(caller);
     let homework = switch (Map.get(diary, ihash, id)) {
       case null return #err("Invalid id");
@@ -394,7 +394,7 @@ actor {
       title = homework.title;
       description = homework.description;
       dueDate = homework.dueDate;
-      completed = true;
+      completed = not homework.completed;
     };
 
     Map.set(diary, ihash, id, modifiedHomework);

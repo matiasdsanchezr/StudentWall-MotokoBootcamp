@@ -30,10 +30,12 @@ const Homeworks = (): JSX.Element => {
   if (homeworkDiaryQuery.isError) return <div className=""></div>;
 
   return (
-    <div className="grid">
-      {' '}
-      <Tab.Group as="div" className="w-full h-full px-1 sm:px-10">
-        <Tab.List className="m-auto flex justify-center rounded-xl bg-blue-900/20 p-1 w-full max-w-[800px]">
+    <div className="grid content-start min-h-full">
+      <Tab.Group
+        as="div"
+        className="grid gap-3 w-full max-w-5xl min-h-full mx-auto px-1"
+      >
+        <Tab.List className="flex justify-center rounded-xl bg-blue-900/20 p-1">
           {Object.keys(categories).map((category) => (
             <Tab
               key={category}
@@ -51,33 +53,23 @@ const Homeworks = (): JSX.Element => {
             </Tab>
           ))}
         </Tab.List>
-        <Tab.Panels className="mt-2 bg-black/5 rounded-xl p-1 md:p-5 min-h-full">
-          <Tab.Panel key={0}>
-            <div className="grid-rows-1 gap-3 rounded-xl min-h-[1000px]">
-              {homeworkDiaryQuery.data?.map(([key, homework]) => (
-                <HomeworkCard
-                  key={key.toString()}
-                  homeworkId={key}
-                  homework={homework}
-                />
-              ))}
-            </div>
-          </Tab.Panel>
-          <Tab.Panel key={1}>
-            <div className="grid gap-3 justify-center rounded-xl min-h-[1000px]">
-              {homeworkDiaryQuery.data?.map(([key, homework]) => (
-                <HomeworkCard
-                  key={key.toString()}
-                  homeworkId={key}
-                  homework={homework}
-                />
-              ))}
-            </div>
+        <Tab.Panels className="bg-black/2 rounded-xl p-1 min-h-full">
+          <Tab.Panel
+            key={0}
+            className="grid grid-cols-12 content-start gap-3 rounded-xl"
+          >
+            {homeworkDiaryQuery.data?.map(([key, homework]) => (
+              <HomeworkCard
+                key={key.toString()}
+                homeworkId={key}
+                homework={homework}
+              />
+            ))}
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
       <button
-        className="btn-primary m-auto"
+        className="btn-primary my-3 m-auto"
         onClick={() => {
           setShowAddHomeworkModal(true);
         }}

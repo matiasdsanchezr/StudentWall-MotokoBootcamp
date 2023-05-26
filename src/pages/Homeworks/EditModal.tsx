@@ -69,12 +69,6 @@
 //                       <button type="submit" className="btn-primary">
 //                         Edit
 //                       </button>
-//                       <button type="submit" className="btn-primary">
-//                         Mark as completed
-//                       </button>
-//                       <button type="submit" className="btn-primary">
-//                         Delete
-//                       </button>
 //                     </div>
 //                   </form>
 //                 </Dialog.Panel>
